@@ -53,18 +53,8 @@ Download from [terraform.io](https://www.terraform.io/downloads)
 
 **Repeat for each region** you plan to use (same name, different regions).
 
-#### Option 2: Import Existing Key (Advanced)
 
-If you have an existing SSH key pair:
-
-```bash
-# Import your public key to multiple regions
-aws ec2 import-key-pair --key-name "wireguard-key" --public-key-material fileb://~/.ssh/id_rsa.pub --region us-west-2
-aws ec2 import-key-pair --key-name "wireguard-key" --public-key-material fileb://~/.ssh/id_rsa.pub --region eu-west-1
-# Add more regions as needed
-```
-
-#### Option 3: Use Your Existing Keys
+#### Option 2: Use Your Existing Keys
 
 If you already have key pairs in some regions, just note their names. Terraform will prompt you for the key name during deployment.
 
@@ -92,9 +82,10 @@ Edit `terraform.tfvars`:
 
 ```hcl
 aws_region = "eu-north-1"        # Your preferred region
+aws_access_key = "your-aws-access-key"
+aws_secret_key = "your-aws-secret-key"
 ssh_key_name = "wireguard-key"   # Your SSH key name in AWS
 instance_name = "My VPN Server"  # Name for your EC2 instance
-wireguard_peers = 20             # Number of peer configs
 ```
 
 **Important**: Make sure the `ssh_key_name` exists in your selected `aws_region`!

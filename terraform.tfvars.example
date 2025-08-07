@@ -1,0 +1,9 @@
+# Example configuration file
+# Copy this to terraform.tfvars and customize with your values
+
+# AWS Region (choose your preferred region)
+aws_region = "eu-north-1"
+
+# SSH Key Name (must exist in your selected region)
+# Create one in EC2 console if you don't have it
+ssh_key_name = "your-key-name"

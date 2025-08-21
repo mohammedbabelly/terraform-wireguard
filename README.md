@@ -115,6 +115,8 @@ ssh_connection_command = "ssh -i ~/.ssh/my-key-pair.pem ubuntu@1.2.3.4"
 ```
 
 Visit the web UI URL to manage your WireGuard VPN!
+<img width="991" height="540" alt="Screenshot 2025-08-21 at 11 54 58" src="https://github.com/user-attachments/assets/c3fdb401-0990-45cc-8ab4-2450e7ad78ae" />
+
 
 ## WireGuard Client Setup
 

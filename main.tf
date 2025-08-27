@@ -17,6 +17,8 @@ provider "aws" {
 # AMI mapping for Ubuntu 24.04 LTS across regions
 locals {
   region_ami_map = {
+    "me-south-1"      = "ami-082c5ebcf775970ae"
+    "me-central-1"   = "ami-0fef9c511a52d9d03"
     "us-east-1"      = "ami-0e2c8caa4b6378d8c"
     "us-east-2"      = "ami-0ea3c35c5c3284d82"
     "us-west-1"      = "ami-0472eef47f816e45d"
@@ -26,12 +28,10 @@ locals {
     "eu-west-3"      = "ami-05b5a865c3579bbc4"
     "eu-central-1"   = "ami-0e067cc8a2b58de59"
     "eu-north-1"     = "ami-042b4708b1d05f512"
+    "eu-south-1"     = "ami-0bb1c333c72a7ebb4"
     "ap-southeast-1" = "ami-047126e50991d067b"
-    "ap-southeast-2" = "ami-0146fc9ad419e2cfd"
     "ap-northeast-1" = "ami-0f36dcfcc94112ea1"
-    "ap-northeast-2" = "ami-062cf18d655c0b1e8"
     "ap-south-1"     = "ami-0dee22c13ea7a9a67"
-    "sa-east-1"      = "ami-0c2b8ca1dad447f8a"
     "ca-central-1"   = "ami-0ea418336406c6c43"
   }
   
@@ -62,13 +62,22 @@ resource "aws_security_group" "wireguard_sg" {
     description = "WireGuard VPN"
   }
 
-  # WireGuard Web UI
+  # HTTP (for redirect WireGuard Web UI to HTTPS)
   ingress {
-    from_port   = 51821
-    to_port     = 51821
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "WireGuard Web UI"
+    description = "HTTP (redirects to HTTPS)"
+  }
+
+  # HTTPS (WireGuard Web UI)
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTPS WireGuard Web UI"
   }
 
   # All outbound traffic
@@ -88,7 +97,7 @@ resource "aws_security_group" "wireguard_sg" {
 # Create EC2 instance
 resource "aws_instance" "wireguard_server" {
   ami                    = local.ami_id
-  instance_type          = "t3.nano"
+  instance_type          = var.instance_type
   key_name              = var.ssh_key_name
   vpc_security_group_ids = [aws_security_group.wireguard_sg.id]
 

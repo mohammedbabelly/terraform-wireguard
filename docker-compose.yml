@@ -9,19 +9,17 @@ services:
       - WG_PERSISTENT_KEEPALIVE=25
       - WG_DEFAULT_ADDRESS=10.8.0.x
       - INSECURE=true
-
     image: ghcr.io/wg-easy/wg-easy:15
     container_name: wg-easy
     networks:
-      wg:
-        ipv4_address: 10.42.42.42
-        ipv6_address: fdcc:ad94:bacf:61a3::2a
+      - wg
     volumes:
       - etc_wireguard:/etc/wireguard
       - /lib/modules:/lib/modules:ro
     ports:
-      - "51820:51820/udp"
-      - "51821:51821/tcp"
+      - "51820:51820/udp"  # WireGuard VPN port (still exposed directly)
+    expose:
+      - "51821"  # Web UI (only accessible via nginx proxy)
     restart: unless-stopped
     cap_add:
       - NET_ADMIN
@@ -32,6 +30,21 @@ services:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
       - net.ipv6.conf.default.forwarding=1
+
+  nginx:
+    image: nginx:alpine
+    container_name: wireguard-nginx
+    networks:
+      - wg
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    ports:
+      - "80:80"    # HTTP (redirects to HTTPS)
+      - "443:443"  # HTTPS
+    restart: unless-stopped
+    depends_on:
+      - wg-easy
 
 networks:
   wg:
